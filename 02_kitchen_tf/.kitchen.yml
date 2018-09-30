@@ -1,0 +1,78 @@
+driver:
+  name: terraform
+  # The test fixture Terraform configuration is configured to be the Terraform root module
+  root_module_directory: test/fixtures/wrapper
+  variable_files:
+    - test/fixtures/wrapper/testing.tfvars
+  variables:
+      instance_ami: ami-0d4f06b6115f118f4
+      subnet_availability_zone: eu-west-1b
+
+provisioner:
+  name: terraform
+
+verifier:
+  name: terraform
+
+# Platforms provide hooks for overriding the global Test Kitchen plugin configuration to provide platform-specific values
+platforms:
+  - name: aws
+    verifier:
+      systems:
+        - name: remote
+          attrs_outputs:
+            security_group_id_kt: security_group_id
+            vpc_id_kt: vpc_id
+          backend: aws
+          controls:
+            - aws_resources
+
+        - name: local
+            # The customized_inspec_attribute InSpec attribute is configured to
+            # satisfy the inspec_attributes control
+          attrs_outputs:
+            customized_inspec_attribute: static_terraform_output
+          backend: local
+            # A subset of the controls included in the extensive_suite InSpec
+            # profile will be executed
+          controls:
+            - inspec_attributes
+            - state_file
+
+  - name: ubuntu
+    verifier:
+      systems:
+        - name: remote
+          attrs:
+            - test/integration/extensive_suite/ubuntu_attributes.yml
+          backend: ssh
+          controls:
+            - operating_system
+            - reachable_other_host
+          # The value of the Terraform output named remote_group_public_dns will
+          # be used to obtain the hostnames to target with InSpec
+          hosts_output: test_target_public_dns
+          # The generated key pair is configured to be used for the SSH
+          # authentication performed by InSpec
+          key_files:
+            - ~/test/private-key/kitchen-terraform.pem
+          user: ubuntu
+
+        - name: local
+          # The customized_inspec_attribute InSpec attribute is configured to
+          # satisfy the inspec_attributes control
+          attrs_outputs:
+            customized_inspec_attribute: static_terraform_output
+          backend: local
+            # A subset of the controls included in the extensive_suite InSpec
+            # profile will be executed
+          controls:
+            - inspec_attributes
+            - state_file
+
+# Suites include tests and provide additional hooks for overriding the global Test Kitchen plugin configuration
+# Kitchen-Terraform will assume that the InSpec profile for this suite islocated at test/integration/extensive_suite
+suites:
+  - name: extensive_suite
+    
+

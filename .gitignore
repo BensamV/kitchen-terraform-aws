@@ -3,6 +3,7 @@ build/
 .terraform
 .DS_Store
 .kitchen
+.pem
 *.tfstate
 *.backup
 */plan
