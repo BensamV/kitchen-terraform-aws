@@ -1,0 +1,10 @@
+build/
+.gradle/
+.terraform
+.DS_Store
+.kitchen
+*.tfstate
+*.backup
+*/plan
+*/terraform.tfstate
+*/terraform.tfstate.backup

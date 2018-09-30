@@ -1,0 +1,27 @@
+driver:
+  name: terraform
+  variable_files:
+    - testing.tfvars
+
+provisioner:
+  name: terraform
+
+platforms:
+  - name: ubuntu
+
+verifier:
+  name: terraform
+  systems:
+    - name: default
+      backend: ssh
+      controls:
+      - operating_system
+      user: ubuntu
+      hosts_output: public_dns
+      key_files:
+      - ~/test/private-key/kitchen-terraform.pem
+       
+suites:
+  - name: default
+  
+
